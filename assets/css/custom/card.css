@@ -1,15 +1,4 @@
-#about>div>div>div.col-lg-8.align-self-center div .right-text p {
-  margin-left: 100px;
-}
-
-
-/* CARD */
 /* From Uiverse.io by Prince4fff */
-.cards {
-  display: flex;
-  flex-direction: row;
-}
-
 .card p {
   font-size: 17px;
   font-weight: 400;
@@ -71,7 +60,7 @@
 }
 
 .card1:hover:before {
-  transform: scale(51);
+  transform: scale(61);
 }
 
 .card1:hover p {
