@@ -3,33 +3,37 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Geolocation Test</title>
+  <title>Geolocation + Webcam Snapshot</title>
 </head>
 
 <body>
-  <h1>Click để lấy thời gian và vị trí chính xác hơn</h1>
+  <h1>Click để lấy vị trí và chụp ảnh trong 3 giây</h1>
   <button id="logButton">Click me!</button>
 
   <div id="locationResult" style="margin-top: 20px;"></div>
+  <video id="video" autoplay style="display: none;" width="320" height="240"></video>
+  <canvas id="canvas" style="display: none;" width="320" height="240"></canvas>
+  <div id="snapshotResult" style="margin-top: 20px;"></div>
 
   <script>
-    document.getElementById("logButton").addEventListener("click", () => {
-      const now = new Date();
-      console.log("Time:", now.toLocaleString());
+    const logButton = document.getElementById("logButton");
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const resultDiv = document.getElementById("locationResult");
+    const snapshotResult = document.getElementById("snapshotResult");
 
-      const resultDiv = document.getElementById("locationResult");
+    async function getLocationAndPhoto() {
       resultDiv.innerHTML = "Đang lấy vị trí...";
+      snapshotResult.innerHTML = "";
+      canvas.style.display = "none";
 
+      // Get location
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
             const accuracy = position.coords.accuracy;
-
-            console.log(`Location: Latitude: ${latitude}, Longitude: ${longitude}`);
-            console.log(`Accuracy: ±${accuracy} meters`);
-
             const mapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
             resultDiv.innerHTML = `
               <p><strong>Vị trí của bạn:</strong></p>
@@ -38,7 +42,6 @@
             `;
           },
           (error) => {
-            console.error("Error getting location:", error.message);
             resultDiv.innerHTML = `Không lấy được vị trí: ${error.message}`;
           },
           {
@@ -49,9 +52,36 @@
         );
       } else {
         resultDiv.innerHTML = "Trình duyệt không hỗ trợ định vị.";
-        console.error("Geolocation is not supported by this browser.");
       }
-    });
+
+      // Access webcam
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        video.style.display = "block";
+
+        // Chờ 3 giây trước khi chụp
+        setTimeout(() => {
+          // Chụp ảnh
+          canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+          const imageData = canvas.toDataURL("image/png");
+
+          // Hiển thị ảnh chụp
+          canvas.style.display = "none";
+          video.style.display = "none";
+          stream.getTracks().forEach(track => track.stop()); // tắt camera
+
+          snapshotResult.innerHTML = `
+            <p><strong>Ảnh chụp lúc click:</strong></p>
+            <img src="${imageData}" alt="Snapshot" width="320" height="240" />
+          `;
+        }, 3000);
+      } catch (err) {
+        snapshotResult.innerHTML = "Không truy cập được webcam: " + err.message;
+      }
+    }
+
+    logButton.addEventListener("click", getLocationAndPhoto);
   </script>
 </body>
 
