@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Geolocation Test</title>
+</head>
+
+<body>
+  <h1>Click để lấy thời gian và vị trí chính xác hơn</h1>
+  <button id="logButton">Click me!</button>
+
+  <script>
+    document.getElementById("logButton").addEventListener("click", () => {
+      const now = new Date();
+      console.log("Time:", now.toLocaleString());
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            const accuracy = position.coords.accuracy;
+            console.log(`Location: Latitude: ${latitude}, Longitude: ${longitude}`);
+            console.log(`Accuracy: ±${accuracy} meters`);
+            alert(`Location: Latitude: ${latitude}, Longitude: ${longitude}`);
+          },
+          (error) => {
+            console.error("Error getting location:", error.message);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          }
+        );
+      } else {
+        console.error("Geolocation is not supported by this browser.");
+      }
+    });
+  </script>
+</body>
+
+</html>
