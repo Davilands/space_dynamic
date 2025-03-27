@@ -10,10 +10,15 @@
   <h1>Click để lấy thời gian và vị trí chính xác hơn</h1>
   <button id="logButton">Click me!</button>
 
+  <div id="locationResult" style="margin-top: 20px;"></div>
+
   <script>
     document.getElementById("logButton").addEventListener("click", () => {
       const now = new Date();
       console.log("Time:", now.toLocaleString());
+
+      const resultDiv = document.getElementById("locationResult");
+      resultDiv.innerHTML = "Đang lấy vị trí...";
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -21,13 +26,20 @@
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
             const accuracy = position.coords.accuracy;
+
             console.log(`Location: Latitude: ${latitude}, Longitude: ${longitude}`);
             console.log(`Accuracy: ±${accuracy} meters`);
-            alert(`Location: Latitude: ${latitude}, Longitude: ${longitude}`);
+
+            const mapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+            resultDiv.innerHTML = `
+              <p><strong>Vị trí của bạn:</strong></p>
+              <p><a href="${mapsLink}" target="_blank">${mapsLink}</a></p>
+              <p>Độ chính xác: ±${accuracy.toFixed(2)} mét</p>
+            `;
           },
           (error) => {
-            alert(error)
             console.error("Error getting location:", error.message);
+            resultDiv.innerHTML = `Không lấy được vị trí: ${error.message}`;
           },
           {
             enableHighAccuracy: true,
@@ -36,6 +48,7 @@
           }
         );
       } else {
+        resultDiv.innerHTML = "Trình duyệt không hỗ trợ định vị.";
         console.error("Geolocation is not supported by this browser.");
       }
     });
