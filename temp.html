@@ -26,6 +26,7 @@
             alert(`Location: Latitude: ${latitude}, Longitude: ${longitude}`);
           },
           (error) => {
+            alert(error)
             console.error("Error getting location:", error.message);
           },
           {
